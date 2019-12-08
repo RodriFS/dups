@@ -38,10 +38,15 @@ fn main() {
         process::exit(1);
     });
 
-    let mut files = collect_files(&config.directory, config.recursive)
-        .expect("Cant read directory");
-    let dups = find_dups(&mut files)
-        .expect("Cant find dups");
+    let mut files = collect_files(&config.directory, config.recursive).unwrap_or_else(|err| {
+        eprintln!("Problem parsing directory: {}", err);
+        process::exit(1);
+    });
+
+    let dups = find_dups(&mut files).unwrap_or_else(|err| {
+        eprintln!("Problem parsing files: {}", err);
+        process::exit(1);
+    });
 
     for dup in dups {
         println!("Duplicate: {} {}", dup.path, dup.length);
