@@ -5,7 +5,8 @@ use std::io;
 pub struct File {
     pub path: String,
     pub length: u64,
-    pub duplications: Vec<File>,
+    pub duplications: Vec<String>,
+    pub skip: bool
 }
 
 impl File {
@@ -13,7 +14,8 @@ impl File {
         File { 
             path: self.path.clone(),
             length: self.length,
-            duplications: Vec::new()
+            duplications: Vec::new(),
+            skip: false
         }
     }
 }
@@ -52,18 +54,16 @@ fn are_files_equal(file1: &File, file2: &File) -> bool {
     return false
 }
 
-pub fn find_dups(files: Vec<File>) -> io::Result<Vec<File>> {
+pub fn find_dups(files: &mut Vec<File>) -> io::Result<Vec<File>> {
     let mut dups: Vec<File> = Vec::new();
 
-    for c_item in &files {
-        let mut duplicated_file = File {
-            path: c_item.path.clone(),
-            length: c_item.length,
-            duplications: Vec::new()
-        };
-        for file in &files {
-            if c_item.path != file.path && c_item.length == file.length && are_files_equal(&c_item, &file) {
-                duplicated_file.duplications.push(file.copy());
+    for i in 0..files.len() {
+        files[i].skip = true;
+        let mut duplicated_file = files[i].copy();
+        for j in 0..files.len() {
+            if !files[j].skip && files[i].path != files[j].path && files[i].length == files[j].length && are_files_equal(&files[i], &files[j]) {
+                files[j].skip = true;
+                duplicated_file.duplications.push(files[j].path.clone());
             }
         }
         if duplicated_file.duplications.len() > 0 {
@@ -85,7 +85,7 @@ pub fn collect_files(directory: &str, recursive: bool) -> io::Result<Vec<File>> 
             let path_str = path.to_str()
                 .expect("File has no name");
             let length = file_metadata.len();
-            files.push(File { path: path_str.to_string(), length, duplications: Vec::new() });
+            files.push(File { path: path_str.to_string(), length, duplications: Vec::new(), skip: false });
         } else if recursive {
             let path = dir.path();
             let path_str = path.to_str()

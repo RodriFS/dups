@@ -17,7 +17,7 @@ impl Config {
 
         let mut recursive = false;
         for arg in args {
-            if arg == "r" {
+            if arg == "-r" || arg == "--recursive" {
                 recursive = true;
             }
         }
@@ -38,13 +38,17 @@ fn main() {
         process::exit(1);
     });
 
-    let files = collect_files(&config.directory, config.recursive)
+    let mut files = collect_files(&config.directory, config.recursive)
         .expect("Cant read directory");
-    let dups = find_dups(files)
+    let dups = find_dups(&mut files)
         .expect("Cant find dups");
 
     for dup in dups {
         println!("Duplicate: {} {}", dup.path, dup.length);
+        for d in dup.duplications {
+            println!("Duplicate: {} {}", d, dup.length)
+        }
+        println!("")
     }
     
 }
