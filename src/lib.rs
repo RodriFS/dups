@@ -1,7 +1,6 @@
 use std::fs;
 use std::io::Read;
 use std::io;
-// use std::error::Error;
 
 pub struct File {
     pub path: String,
@@ -16,7 +15,7 @@ impl File {
             path: self.path.clone(),
             length: self.length,
             duplications: Vec::new(),
-            skip: false
+            skip: self.skip
         }
     }
 }
@@ -159,4 +158,64 @@ pub fn collect_files(directory: &str, recursive: bool) -> io::Result<Vec<File>> 
         }
     }
     Ok(files)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::env;
+
+    fn create_file(path: String, length: u64) -> File {
+        File {
+            path,
+            length,
+            duplications: Vec::new(),
+            skip: false
+        }
+    }
+
+    #[test]
+    fn clones_correctly() {
+        let file = create_file(String::from("./test.txt"), 100);
+
+        let copied_file = file.copy();
+
+        assert_eq!(file.path, copied_file.path);
+        assert_eq!(file.length, copied_file.length);
+        assert_eq!(file.duplications, copied_file.duplications);
+        assert_eq!(file.skip, copied_file.skip);
+    }
+
+    #[test]
+    fn compares_correctly() {
+        let file1 = create_file(String::from("./test.txt"), 100);
+        let file2 = create_file(String::from("./test.txt"), 100);
+
+        assert!(file1.eq(&file2));
+    }
+
+    #[test]
+    fn are_empty() {
+        let file1 = create_file(String::from("./test.txt"), 0);
+        let file2 = create_file(String::from("./test.txt"), 0);
+        
+        match are_files_equal(&file1, &file2) {
+            Ok(result) => assert!(result),
+            Err(err) => eprintln!("Couldn't read files {}", err)
+        };
+    }
+
+    #[test]
+    fn are_equal() {
+        let path = env::current_dir().unwrap();
+        let str_path1 = format!("{}{}", path.to_str().unwrap(), "/test/assets/test_binary");
+        let str_path2 = format!("{}{}", path.to_str().unwrap(), "/test/assets/test_binary_text.txt");
+        let file1 = create_file(str_path1, 100);
+        let file2 = create_file(str_path2, 100);
+        
+        match are_files_equal(&file1, &file2) {
+            Ok(result) => assert!(result),
+            Err(err) => eprintln!("Couldn't read files {}", err)
+        };
+    }
 }
