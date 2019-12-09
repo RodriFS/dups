@@ -22,4 +22,4 @@ Path:
 Optionally you can output your results to a txt file:
 ```
 ./target/debug/dups -r ./Documents > output.txt
-
+```

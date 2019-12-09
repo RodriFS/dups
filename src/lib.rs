@@ -174,6 +174,13 @@ mod test {
         }
     }
 
+    fn get_testing_file_path(file: &str) -> String {
+        let mut path = env::current_dir().unwrap();
+        path.push("test");
+        path.push("assets");
+        format!("{}/{}", path.to_str().unwrap(), file)
+    }
+
     #[test]
     fn clones_correctly() {
         let file = create_file(String::from("./test.txt"), 100);
@@ -195,7 +202,7 @@ mod test {
     }
 
     #[test]
-    fn are_empty() {
+    fn are_files_equal_assert_empty() {
         let file1 = create_file(String::from("./test.txt"), 0);
         let file2 = create_file(String::from("./test.txt"), 0);
         
@@ -206,15 +213,47 @@ mod test {
     }
 
     #[test]
-    fn are_equal() {
-        let path = env::current_dir().unwrap();
-        let str_path1 = format!("{}{}", path.to_str().unwrap(), "/test/assets/test_binary");
-        let str_path2 = format!("{}{}", path.to_str().unwrap(), "/test/assets/test_binary_text.txt");
+    fn are_files_equal_assert_equal() {
+        let str_path1 = get_testing_file_path("test_binary");
+        let str_path2 = get_testing_file_path("test_binary2");
         let file1 = create_file(str_path1, 100);
         let file2 = create_file(str_path2, 100);
         
         match are_files_equal(&file1, &file2) {
             Ok(result) => assert!(result),
+            Err(err) => eprintln!("Couldn't read files {}", err)
+        };
+    }
+
+    #[test]
+    fn are_files_equal_assert_not_equal() {
+        let str_path1 = get_testing_file_path("test_binary");
+        let str_path2 = get_testing_file_path("test_binary_texts.txt");
+        let file1 = create_file(str_path1, 100);
+        let file2 = create_file(str_path2, 100);
+        
+        match are_files_equal(&file1, &file2) {
+            Ok(result) => assert!(!result),
+            Err(err) => eprintln!("Couldn't read files {}", err)
+        };
+    }
+
+    #[test]
+    fn finds_duplicates_correctly() {
+        let str_path1 = get_testing_file_path("test_binary");
+        let str_path2 = get_testing_file_path("test_binary_text.txt");
+        let str_path3 = get_testing_file_path("test_binary2");
+        let file1 = create_file(str_path1.clone(), 495224);
+        let file2 = create_file(str_path2, 495224);
+        let file3 = create_file(str_path3, 495224);
+        
+        let mut files = vec![file1, file2, file3];
+        match find_dups(&mut files) {
+            Ok(result) => {
+                assert_eq!(result.len(), 1);
+                assert_eq!(result[0].path, str_path1);
+                assert_eq!(result[0].duplications.len(), 1);
+            },
             Err(err) => eprintln!("Couldn't read files {}", err)
         };
     }
