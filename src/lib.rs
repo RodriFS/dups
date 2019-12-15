@@ -160,6 +160,15 @@ pub fn collect_files(directory: &str, recursive: bool) -> io::Result<Vec<File>> 
     Ok(files)
 }
 
+pub fn print_help() {
+    println!("dups [Options] [Path]\n");
+    println!("Options:");
+    println!("-r --recursive: Finds files in subdirectories.");
+    println!("-h --help: Prints out help\n");
+    println!("Path:");
+    println!("The path of the folder you want to search the duplicates in.");
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

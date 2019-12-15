@@ -8,11 +8,12 @@ cargo build
 
 how to run:
 ```
-./target/debug/dups [Options] [Path]
+cargo run -- [Options] [Path]
 ```
 
 Options:
   -r --recursive: Finds files in subdirectories.
+  -h --help: Prints out help
 
 Path:
   The path of the folder you want to search the duplicates in.
@@ -21,5 +22,5 @@ Path:
 
 Optionally you can output your results to a txt file:
 ```
-./target/debug/dups -r ./Documents > output.txt
+cargo run -- -r ./Documents > output.txt
 ```

@@ -2,7 +2,7 @@ use std::env;
 use std::process;
 
 mod lib;
-use lib::{collect_files, find_dups};
+use lib::{collect_files, find_dups, print_help};
 
 struct Config {
     directory: String,
@@ -12,13 +12,19 @@ struct Config {
 impl Config {
     fn new(args: &[String]) -> Result<Config, &'static str> {
         if args.len() < 2 {
-            return Err("not enough arguments");
+            println!("Error: not enough arguments\n");
+            print_help();
+            std::process::exit(0);
         }
 
         let mut recursive = false;
         for arg in args {
             if arg == "-r" || arg == "--recursive" {
                 recursive = true;
+            }
+            if arg == "-h" || arg == "--help" {
+                print_help();
+                std::process::exit(0);
             }
         }
 
