@@ -3,11 +3,6 @@ A rather unperformant duplicate files finder
 
 ## How to run:
 ```
-cargo build
-```
-
-how to run:
-```
 cargo run -- [Options] [Path]
 ```
 
