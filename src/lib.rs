@@ -257,4 +257,26 @@ mod test {
             Err(err) => eprintln!("Couldn't read files {}", err)
         };
     }
+
+    #[test]
+    fn collect_files_correctly() {
+        let dir_path = get_testing_file_path("/");
+        match collect_files(&dir_path, false) {
+            Ok(result) => {
+                assert_eq!(result.len(), 7);
+            },
+            Err(err) => eprintln!("Couldn't read directory {}", err)
+        }
+    }
+
+    #[test]
+    fn collect_files_recursively_correctly() {
+        let dir_path = get_testing_file_path("/");
+        match collect_files(&dir_path, true) {
+            Ok(result) => {
+                assert_eq!(result.len(), 8);
+            },
+            Err(err) => eprintln!("Couldn't read directory {}", err)
+        }
+    }
 }
